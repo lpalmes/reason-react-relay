@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "lib": ["dom", "esnext"],
+    "module": "es2015",
+    "moduleResolution": "node",
+    "strict": true,
+    "target": "es2015"
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
