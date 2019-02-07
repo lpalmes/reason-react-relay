@@ -1,5 +1,5 @@
-import { RecordNode, ScalarNode, RecordScalar } from "./Printer/ReasonASTTypes";
 import { IRTransforms, TypeGenerator } from "relay-compiler";
+import { RecordNode, RecordScalar, ScalarNode } from "./Printer/ReasonASTTypes";
 
 import * as path from "path";
 import * as ts from "typescript";
@@ -16,7 +16,7 @@ import {
   State,
   transformInputType,
   transformScalarType
-} from "./TypeScriptTypeTransformers";
+} from "./TypeTransformers";
 
 // Get the types
 import * as GraphQLCompilerTypes from "graphql-compiler";

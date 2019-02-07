@@ -1,4 +1,59 @@
-type environment;
+module Network = {
+  type network;
+
+  type fetchFunction = (unit, unit) => Js.Promise.t(string);
+
+  [@bs.module "relay-runtime"] [@bs.scope "Network"]
+  external make: fetchFunction => network = "create";
+
+  [@bs.send] external execute: network => Js.Promise.t(string) = "";
+};
+
+module RecordSource = {
+  type recordSource;
+
+  [@bs.module "relay-runtime"] [@bs.new]
+  external make: unit => recordSource = "RecordSource";
+};
+
+module Store = {
+  type store;
+
+  [@bs.module "relay-runtime"] [@bs.new]
+  external make: RecordSource.recordSource => store = "RecordSource";
+};
+
+module Environment = {
+  type environment;
+
+  type config = {
+    network: Network.network,
+    store: Store.store,
+  };
+
+  type configJs = {
+    .
+    "network": Network.network,
+    "store": Store.store,
+  };
+
+  [@bs.module "relay-runtime"] [@bs.new]
+  external makeEnvironment: configJs => environment = "Environment";
+
+  let make = config =>
+    makeEnvironment({"network": config.network, "store": config.store});
+};
+
+let store = Store.make(RecordSource.make());
+
+let network =
+  Network.make((operation, _) => {
+    Js.log(operation);
+    Js.Promise.(resolve("Hello"));
+  });
+
+Network.execute(network);
+let environment = Environment.make({network, store});
 
 type graphqlTag;
 
@@ -49,7 +104,11 @@ type mutationConfig('variables, 'response) = {
   "updater": (string, string) => unit,
 };
 
-/* external commitMutation:(fun (environment: environment) (config: mutationConfig) => unit)  = "commitMutation" [@@bs.module "react-relay"]; */
+[@bs.module "react-relay"]
+external commitMutation:
+  (Environment.environment, mutationConfig('variables, 'response)) => unit =
+  "commitMutation";
+
 module QueryRenderer = {
   type renderProps('error, 'props) = {
     .
@@ -62,7 +121,7 @@ module QueryRenderer = {
       (
         type error,
         type props,
-        ~environment: environment,
+        ~environment: Environment.environment,
         ~query: graphqlTag,
         ~render: renderProps(error, props) => ReasonReact.reactElement,
         ~variables: 'variables,
@@ -79,13 +138,3 @@ module QueryRenderer = {
       children,
     );
 };
-
-[@bs.deriving abstract]
-type person = {
-  name: string,
-  age: int,
-  job: string,
-};
-
-let house = person(~name="Lorenzo", ~age=24, ~job="Developer");
-let name = name(house);

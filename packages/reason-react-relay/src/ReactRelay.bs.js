@@ -3,8 +3,38 @@
 
 var ReasonReact = require("reason-react/src/ReasonReact.js");
 var ReactRelay = require("react-relay");
+var RelayRuntime = require("relay-runtime");
 
-function make(environment, query, render, variables, children) {
+var Network = /* module */[];
+
+var RecordSource = /* module */[];
+
+var Store = /* module */[];
+
+function make(config) {
+  return new RelayRuntime.Environment({
+              network: config[/* network */0],
+              store: config[/* store */1]
+            });
+}
+
+var Environment = /* module */[/* make */make];
+
+var store = new RelayRuntime.RecordSource(new RelayRuntime.RecordSource());
+
+var network = RelayRuntime.Network.create((function (operation, _) {
+        console.log(operation);
+        return Promise.resolve("Hello");
+      }));
+
+network.execute();
+
+var environment = make(/* record */[
+      /* network */network,
+      /* store */store
+    ]);
+
+function make$1(environment, query, render, variables, children) {
   return ReasonReact.wrapJsForReason(ReactRelay.QueryRenderer, {
               environment: environment,
               query: query,
@@ -13,17 +43,14 @@ function make(environment, query, render, variables, children) {
             }, children);
 }
 
-var QueryRenderer = /* module */[/* make */make];
+var QueryRenderer = /* module */[/* make */make$1];
 
-var house = {
-  name: "Lorenzo",
-  age: 24,
-  job: "Developer"
-};
-
-var name = house.name;
-
+exports.Network = Network;
+exports.RecordSource = RecordSource;
+exports.Store = Store;
+exports.Environment = Environment;
+exports.store = store;
+exports.network = network;
+exports.environment = environment;
 exports.QueryRenderer = QueryRenderer;
-exports.house = house;
-exports.name = name;
-/* name Not a pure module */
+/* store Not a pure module */

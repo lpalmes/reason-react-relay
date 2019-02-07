@@ -140,3 +140,4 @@ const unionAst: UnionNode = {
   nodes: ["Blue", "Red", "Yellow"]
 };
 const printed = printReason([unionAst, dateRecord, userRecord]);
+console.log(printed);
